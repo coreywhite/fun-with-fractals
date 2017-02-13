@@ -55,7 +55,7 @@ class MandelbrotRenderer {
     }
     private calculateFractal(): void {
         var data = this.imgData.data;
-        var x_init, y_init, x, y, x_temp, iteration: number;
+        var x_init, y_init, x, y, x_temp, y_temp, iteration: number;
         for(let row = 0; row < this.yResolution; row++) {
             for(let col = 0; col < this.xResolution; col++) {
                 iteration = 0;
@@ -64,8 +64,14 @@ class MandelbrotRenderer {
                 x = y = 0;
                 while(x*x + y*y < 2*2 && iteration < this.maxIterations) {
                     x_temp = x*x - y*y + x_init;
-                    y = 2*x*y + y_init;
+                    y_temp = 2*x*y + y_init;
+                    if(x == x_temp && y == y_temp) {
+                        //Exit early if Z_k+1 = Z_k.
+                        iteration = this.maxIterations;
+                        break;
+                    }
                     x = x_temp;
+                    y = y_temp;
                     iteration++;
                 }
                 this.fractalData[row][col] = iteration;
