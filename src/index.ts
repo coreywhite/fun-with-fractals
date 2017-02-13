@@ -53,7 +53,7 @@ class MandelbrotRenderer {
             this._hasDisplay = false;
         }
     }
-    private updateFractal(): void {
+    private calculateFractal(): void {
         var data = this.imgData.data;
         var x_init, y_init, x, y, x_temp, iteration: number;
         for(let row = 0; row < this.yResolution; row++) {
@@ -95,7 +95,7 @@ class MandelbrotRenderer {
         if(!this._hasDisplay) {
             return;
         }
-        this.updateFractal();
+        this.calculateFractal();
         for(let i = 0; i < this.imgData.height; i++) {
             for(let j = 0; j < this.imgData.width; j++) {
                 var fractalValue = this.getFractalValueAtImagePosition(i, j);
