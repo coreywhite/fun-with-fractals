@@ -142,12 +142,15 @@ class MandelbrotRenderer {
         this.displayCoordinates(fractalCoordinates);        
     }
 
-    handleClick = (event: MouseEvent) => {
+    handleClick = (event: MouseEvent, isRightClick: boolean = false) => {
         var rect = this.canvas.getBoundingClientRect();
         var canvasCoordinates: [number, number] = [event.clientX - rect.left, event.clientY - rect.top];
         var fractalCoordinates = this.getFractalCoordinatesAtCanvasCoordinates(canvasCoordinates);
-
-        this.recenter(fractalCoordinates, this.fractalWidth / 2, this.fractalHeight / 2);
+        if(isRightClick) {
+            this.recenter(fractalCoordinates, this.fractalWidth * 2, this.fractalHeight * 2);
+        } else {
+            this.recenter(fractalCoordinates, this.fractalWidth / 2, this.fractalHeight / 2);
+        }
     }
 }
 
@@ -157,3 +160,7 @@ var mandelbrot = new MandelbrotRenderer(canvas, coordinates);
 mandelbrot.render();
 canvas.addEventListener("click", mandelbrot.handleClick);
 canvas.addEventListener("mousemove", mandelbrot.handleMouseOver);
+canvas.oncontextmenu = (e: MouseEvent) => {
+    e.preventDefault();
+    mandelbrot.handleClick(e, true);
+};
