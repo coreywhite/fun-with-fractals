@@ -11,6 +11,37 @@ class CanvasDisplay {
 
 class Color {
     constructor(readonly R: number, readonly G: number, readonly B: number, readonly A: number = 255) {}
+
+    public static FromHSLA(H: number, S: number, L: number, A: number = 255): Color {
+        let rgb = Color.hslToRgb(H, S, L);
+        return new Color(rgb[0], rgb[1], rgb[2], A);
+    }
+
+    //HSL -> RGB Algorithm from https://gist.github.com/mjackson/5311256
+    private static hslToRgb(h: number, s: number, l: number): [number, number, number] {
+        let r, g, b;
+
+        if (s == 0) {
+            r = g = b = l; // achromatic
+        } else {
+            var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            var p = 2 * l - q;
+
+            r = this.hue2rgb(p, q, h + 1/3);
+            g = this.hue2rgb(p, q, h);
+            b = this.hue2rgb(p, q, h - 1/3);
+        }
+
+        return [ r * 255, g * 255, b * 255 ];
+    }    
+    private static hue2rgb(p: number, q: number, t: number): number {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+    }
 }
 
 class MandelbrotRenderer {
@@ -36,7 +67,7 @@ class MandelbrotRenderer {
         this.centerY = 0;
 
         //TODO: Extract this to something configurable probably.
-        this.maxIterations = 1000;
+        this.maxIterations = 3000;
         this.xResolution = 800;
         this.yResolution = 800;
         this.fractalData = new Array<Array<number>>(this.yResolution);
@@ -99,12 +130,43 @@ class MandelbrotRenderer {
         this.imgData.data[4 * (row * this.imgData.width + col) + 3] = color.A;      //Alpha
     }
 
-    private mapColor(fractalValue: number): Color {
-        if(fractalValue == this.maxIterations) {
-            return new Color(0, 0, 0);
-        } else {
-            return new Color(Math.min(255, (fractalValue - 1) * 20), 0, 0);
+    private buildHistogram(): number[] {
+        // let hist = new Array<number>(this.maxIterations).map(()=>0);
+        let hist:Array<number> = Array.apply(null, Array(this.maxIterations)).map(Number.prototype.valueOf,0);
+        // let hist = new Array<number>(this.maxIterations);
+        // for(let i = 0; i < hist.length; i++) {
+        //     hist[i] = 0;
+        // }
+        for(let row = 0; row < this.yResolution; row++) {
+            for(let col = 0; col < this.xResolution; col++) {
+                hist[this.fractalData[row][col] - 1]++;
+            }
         }
+        return hist;
+    }
+
+    private normalizeHist(hist: number[]): number[] {
+        let totalIter = hist.reduce((a,b)=>a+b,0);
+        // for(let i = 0; i < hist.length; i++) {
+        //     totalIter += hist[i];
+        // }
+        let cumIter = 0;
+        let norm = new Array<number>(hist.length);
+
+        for(let i = 0; i < hist.length; i++) {
+            cumIter += hist[i];
+            norm[i] = cumIter / totalIter;
+        }
+        return norm;
+    }
+
+    private mapColor(fractalValue: number, hist: number[]): Color {
+        return Color.FromHSLA(.5, 1, hist[fractalValue]);
+        // if(fractalValue == this.maxIterations) {
+        //     return Color.FromHSLA(.5, 1, 0)
+        // } else {
+        //     return Color.FromHSLA(.5, 1, hist[fractalValue]);
+        // }
     }
 
     render(): void {
@@ -112,10 +174,11 @@ class MandelbrotRenderer {
             return;
         }
         this.calculateFractal();
+        let hist = this.normalizeHist(this.buildHistogram());
         for(let i = 0; i < this.imgData.height; i++) {
             for(let j = 0; j < this.imgData.width; j++) {
                 var fractalValue = this.getFractalValueAtImagePosition(i, j);
-                this.setPixel(i, j, this.mapColor(fractalValue));
+                this.setPixel(i, j, this.mapColor(fractalValue, hist));
             }
         }
         this._display.render(this.imgData);
