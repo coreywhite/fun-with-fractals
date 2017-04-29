@@ -57,7 +57,7 @@ export class MandelbrotRenderer {
     private readonly fractalData: number[][];
     private readonly imgData: ImageData;
 
-    constructor(readonly canvas: HTMLCanvasElement, readonly coordinatesDisplay: HTMLElement) {
+    constructor(readonly canvas: HTMLCanvasElement, readonly coordinatesChangeHandler: (coordinates:[number, number])=> void) {
         
         //The Mandelbrot set is contained in the closed disk of radius 2 around the origin, so the
         //initial width and height are both 4 and the initial center is at (0, 0) in the complex plane.
@@ -193,16 +193,15 @@ export class MandelbrotRenderer {
         this.render();
     }
 
-    displayCoordinates(coordinates: [number, number]): void {
-        this.coordinatesDisplay.innerHTML = `(${coordinates[0].toFixed(4)},${coordinates[1].toFixed(4)})`;
-    }
+
 
     handleMouseOver = (event: MouseEvent) => {
-        var rect = this.canvas.getBoundingClientRect();
-        var canvasCoordinates: [number, number] = [event.clientX - rect.left, event.clientY - rect.top];
-        var fractalCoordinates = this.getFractalCoordinatesAtCanvasCoordinates(canvasCoordinates);
-        
-        this.displayCoordinates(fractalCoordinates);        
+        if(this.coordinatesChangeHandler) {
+            var rect = this.canvas.getBoundingClientRect();
+            var canvasCoordinates: [number, number] = [event.clientX - rect.left, event.clientY - rect.top];
+            var fractalCoordinates = this.getFractalCoordinatesAtCanvasCoordinates(canvasCoordinates);
+            this.coordinatesChangeHandler(fractalCoordinates);
+        }
     }
 
     handleClick = (event: MouseEvent, isRightClick: boolean = false) => {
