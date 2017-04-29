@@ -1,4 +1,4 @@
-class CanvasDisplay {
+export class CanvasDisplay {
     constructor(readonly ctx: CanvasRenderingContext2D, readonly width: number, readonly height: number){}
 
     getImageData(): ImageData {
@@ -9,7 +9,7 @@ class CanvasDisplay {
     }
 }
 
-class Color {
+export class Color {
     constructor(readonly R: number, readonly G: number, readonly B: number, readonly A: number = 255) {}
 
     public static FromHSLA(H: number, S: number, L: number, A: number = 255): Color {
@@ -44,7 +44,7 @@ class Color {
     }
 }
 
-class MandelbrotRenderer {
+export class MandelbrotRenderer {
     private _display: CanvasDisplay;
     private _hasDisplay: boolean;
     private fractalWidth: number; 
@@ -216,14 +216,3 @@ class MandelbrotRenderer {
         }
     }
 }
-
-var canvas = <HTMLCanvasElement> document.getElementById('fractal-canvas');
-var coordinates = <HTMLElement> document.getElementById("coordinates");
-var mandelbrot = new MandelbrotRenderer(canvas, coordinates);
-mandelbrot.render();
-canvas.addEventListener("click", mandelbrot.handleClick);
-canvas.addEventListener("mousemove", mandelbrot.handleMouseOver);
-canvas.oncontextmenu = (e: MouseEvent) => {
-    e.preventDefault();
-    mandelbrot.handleClick(e, true);
-};
