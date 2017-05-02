@@ -9,3 +9,12 @@ body {
     text-align: center;
     margin-top: 1em;
 }
+#root, .content {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+}
+.testCanvas {
+    width: 100%;
+    height: 200px;
+}
