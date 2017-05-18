@@ -32,7 +32,9 @@ export class CanvasComponent extends React.Component<CanvasComponentProps, undef
 
     render() {
         return (
-            <canvas ref={el=>this.canvas = el} className={this.props.className} />
+            <canvas ref={el=>this.canvas = el} className={this.props.className}>
+                This application requires an HTML Canvas to operate. Unfortunately, your browser does not support Canvas.
+            </canvas>
         );
     }
 }
