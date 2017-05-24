@@ -4,7 +4,7 @@
   "description": "Small project to play with fractals and Canvas.",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --content-base ./ --hot --inline --colors --port 3000 --open",
+    "start": "webpack-dev-server --content-base ./dist --hot --inline --colors --port 3000 --open",
     "build": "webpack --config webpack.config.js --watch"
   },
   "keywords": [],

@@ -1,4 +1,4 @@
 node_modules/
 Notes/
-dist/
+dist/build
 *.log
