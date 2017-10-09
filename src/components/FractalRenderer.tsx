@@ -1,5 +1,6 @@
 import * as React from "react";
 import {CanvasComponent} from "./CanvasComponent"
+import {FractalStatus} from "./FractalStatus"
 import {IFractalCalculator} from "../interfaces/IFractalCalculator"
 import {Color} from "../classes/Color"
 
@@ -32,15 +33,28 @@ export class FractalRenderer extends React.Component<FractalRendererProps, Fract
     }
 
     private handleCalculationDone = (fractalData: number[][]) => {
+        console.log(`Start of handleCalculationDone. Value of calculating: ${this.state.calculating}`);
         this.setState({fractalData: fractalData, calculating: false}, this.setImageData);
+        console.log(`End of handleCalculationDone. Value of calculating: ${this.state.calculating}`);
     }
 
     private handleClick = () => {
-        this.props.fractalCalculator.calculate(this.handleCalculationDone);
-        this.setState({calculating: true});
+        console.log(`Start of handleClick. Value of calculating: ${this.state.calculating}`);
+        this.setState({calculating: true},
+            () => {
+                console.log(`Start of callback in handleClick. Value of calculating: ${this.state.calculating}`);
+                //TODO: Not sure why this setTimeout is necessary, but without it React doesn't re-render
+                //the child components after setting state.calculating to TRUE.
+                setTimeout(()=>{this.props.fractalCalculator.calculate(this.handleCalculationDone);}, 0)
+                //this.props.fractalCalculator.calculate(this.handleCalculationDone);
+                console.log(`End of callback in handleClick. Value of calculating: ${this.state.calculating}`);
+            }
+        );
+        console.log(`End of handleClick. Value of calculating: ${this.state.calculating}`);
     }
 
     private setImageData = () => {
+        console.log(`Start of setImageData. Value of calculating: ${this.state.calculating}`);
         let fractalData = this.state.fractalData;
         let ctx = this.state.ctx;
         let imageData = this.getInitImageData(ctx);
@@ -58,6 +72,7 @@ export class FractalRenderer extends React.Component<FractalRendererProps, Fract
             }
         }
         this.setState({imageData: imageData}, this.renderCanvas);
+        console.log(`End of setImageData. Value of calculating: ${this.state.calculating}`);
     }
 
     private getInitImageData = (ctx: CanvasRenderingContext2D) => {
@@ -100,15 +115,29 @@ export class FractalRenderer extends React.Component<FractalRendererProps, Fract
     }
 
     componentDidMount() {
-        this.props.fractalCalculator.calculate(this.handleCalculationDone);
-        this.setState({calculating: true});
+        console.log(`Start of componentDidMount. Value of calculating: ${this.state.calculating}`);
+        this.setState({calculating: true},
+            () => {
+                console.log(`Start of callback in componentDidMount. Value of calculating: ${this.state.calculating}`);
+                this.props.fractalCalculator.calculate(this.handleCalculationDone);
+                console.log(`End of callback in componentDidMount. Value of calculating: ${this.state.calculating}`);
+            }
+        );
+        console.log(`End of componentDidMount. Value of calculating: ${this.state.calculating}`);
     }
 
+    // shouldComponentUpdate(nextProps:FractalRendererProps, nextState:FractalRendererState){
+    //     console.log(`In shouldComponentUpdate. Old calculating: ${this.state.calculating}. Next calculating: ${this.state.calculating}.`);
+    //     return this.state.calculating != nextState.calculating;
+    // }
+
     render() {
+        console.log(`RENDERING with calculating = ${this.state.calculating}`);
+        let status = this.state.calculating ? 'Calculating...' : 'Ready';
         return (
             <div onClick={this.handleClick} >
             <CanvasComponent className={this.props.className} onContextChange={this.handleContext} />
-            {this.state.calculating && <p className = 'coordinates'>Calculating...</p>}
+            <FractalStatus status={status} />
             </div>
         );
     }

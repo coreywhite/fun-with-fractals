@@ -3,7 +3,7 @@ body {
     display: flex;
     justify-content: center;
 }
-.coordinates {
+.coordinates, .status {
     color: #A00;
     font-size: 18px;
     text-align: center;
