@@ -2,10 +2,13 @@ import * as React from "react";
 import {Coordinates} from "./Coordinates"
 import {MandelbrotRenderer} from "../MandelbrotRenderer"
 import {FractalRenderer} from "./FractalRenderer"
-import {IFractalCalculator} from "../interfaces/IFractalCalculator"
+import {IFractalCalculator, IFractalOptions} from "../interfaces/IFractalCalculator"
 import {MandelbrotCalculator} from "../classes/MandelbrotCalculator"
 
-export interface AppState {fractalCalculator:IFractalCalculator, coordinates:[number, number]};
+export interface AppState {
+    fractalCalculator:IFractalCalculator,
+    coordinates:[number, number]
+};
 
 export class App extends React.Component<undefined, AppState> {
     constructor(props:any) {
@@ -34,12 +37,11 @@ export class App extends React.Component<undefined, AppState> {
         return (
         <div className="content">
             <div className="fractal">
-                {/*<canvas id="fractal-canvas" height="800" width="800" />*/}
-                <FractalRenderer className='testCanvas' fractalCalculator={this.state.fractalCalculator} />
+                <FractalRenderer className='testCanvas'
+                    fractalCalculator={this.state.fractalCalculator}
+                    coordinatesHandler={this.handleCoordinatesUpdate} />
                 <Coordinates coordinates={this.state.coordinates} precision={4} />
             </div>
-            {/*Temporary: Just to demonstrate rendering and resizing.*/}
-            
         </div>
         );
     }
